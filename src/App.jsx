@@ -3,6 +3,7 @@ import {useState} from 'react'
 import 'leaflet/dist/leaflet.css'
 import LocationSelector from './LocationSelector'
 import SearchControl from './SearchControl'
+import AnimatedLine from './AnimatedLine'
 
 function App() {
   
@@ -45,10 +46,12 @@ function App() {
         ))}
 
         {points.length === 2 && (
-          <Polyline 
+          /* { *//* <Polyline 
             positions={points} 
             pathOptions={{ color: 'red', weight: 4, dashArray: '10, 10' }} 
-          />
+          /> *//* } */
+
+          <AnimatedLine positions={points} />
         )}
       </MapContainer>
     </div>
