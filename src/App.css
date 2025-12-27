@@ -25,6 +25,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  font-family: sans-serif;
 }
 
 /* Textos informativos */
@@ -47,6 +48,7 @@
 .input-label {
   font-weight: bold;
   font-size: 14px;
+  font-family: inherit;
 }
 
 .message-input {
@@ -83,8 +85,10 @@
 }
 
 .btn-secondary {
-  background: #333;
+  background: #0365de;
   color: white;
+  margin: auto;
+  
 }
 
 .btn-ghost {
@@ -152,4 +156,30 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+/* Asegura que los SVGs de Leaflet no se corten durante la captura */
+.leaflet-overlay-pane svg {
+    overflow: visible !important;
+}
+/* Creative technologist watermark */
+
+.watermark {
+  position: absolute;
+  bottom: 100px;
+  right: 50px;
+  font-size: 15px;
+  font-family: sans-serif;
+  font-weight: bold;
+  opacity: 0.6; /* Un poco transparente para que se vea "marca de agua" */
+  pointer-events: none; /* Para que no estorbe los clics del mapa */
+  z-index: 1000; /* ¡Muy importante! Para que flote sobre el mapa y las capas */
+  color: #00195e; /* Color oscuro por defecto */
+}
+
+/* Ajuste específico para cuando está dentro de la carta (popup) */
+.popup-content .watermark {
+  bottom: 15px;
+  right: 20px;
+  color: #00195e; /* Gris clarito para la carta blanca */
+  font-size: 12px;
 }

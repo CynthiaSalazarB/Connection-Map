@@ -1,7 +1,9 @@
-import {MapContainer, TileLayer,CircleMarker, Polyline} from 'react-leaflet'
+import {MapContainer, TileLayer,CircleMarker, Tooltip} from 'react-leaflet'
 import {useState, useEffect} from 'react'
 import 'leaflet/dist/leaflet.css'
 import LZString from 'lz-string'
+import { toPng } from 'html-to-image';
+//import html2canvas from 'html2canvas'
 //import L from 'leaflet';
 
 import LocationSelector from './LocationSelector'
@@ -18,7 +20,9 @@ function App() {
   const [isViewingMode, setIsViewingMode] = useState(false);
   const [letterArrived, setLetterArrived] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-
+  const [fromName, setFromName]=useState("");
+  const [toName, setToName] = useState("");
+  
   // FASE 1: LECTURA (Al cargar la página)
 
 useEffect(()=>{
@@ -27,6 +31,8 @@ useEffect(()=>{
   const startParam = params.get('from');
   const endParam = params.get ('to');
   const msgParam = params.get('msg');
+  const fnParam = params.get('fn');
+  const tnParam = params.get('tn');
 
   const processData =()=>{
 
@@ -39,14 +45,15 @@ useEffect(()=>{
         
         // Auto-zoom para que se vean los dos puntos  
         setPoints([{ lat: startLat, lng: startLng }, { lat: endLat, lng: endLng }]);   
-      /* if (mapRef.current) {
-        const bounds = L.latLngBounds([loadedPoints[0], loadedPoints[1]]);
-        mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-      } */
+      
       }catch(e){
         console.error("Error reading coords",e);
       }
     }
+
+    if(fnParam) setFromName(decodeURIComponent(fnParam));
+    if(tnParam) setToName(decodeURIComponent(tnParam));
+
     if(msgParam){
         const decompressed = LZString.decompressFromEncodedURIComponent(msgParam);
         if(decompressed){
@@ -57,8 +64,6 @@ useEffect(()=>{
   processData();
 
 },[]);
-
-
 
 // FASE 2: ESCRITURA (Solo si NO estamos en modo visualización)
 
@@ -75,6 +80,12 @@ if(points[1]){
   params.set('to', `${points[1].lat.toFixed(4)},${points[1].lng.toFixed(4)}`)
 }
 
+if(fromName) params.set('fn', encodeURIComponent(fromName));
+else params.delete('fn');
+
+if(toName) params.set('tn', encodeURIComponent(toName));
+else params.delete('tn');
+
 if(message){
   const compressed = LZString.compressToEncodedURIComponent(message);
   params.set('msg', compressed);
@@ -84,8 +95,7 @@ if(message){
 
 // Actualizar la URL sin recargar
 window.history.replaceState({}, '', `?${params.toString()}`);
-},[points,message, isViewingMode]);
-
+},[points,message, isViewingMode,fromName, toName]);
 
 const handleLocationSelect = (latlng)=>{
   // Si intentan hacer clic mientras ven un mensaje, reiniciamos todo a modo creador
@@ -108,6 +118,88 @@ const handleLocationSelect = (latlng)=>{
    }
   };
 
+  const handleDownloadImage = async () => {
+    // 1. Ocultar la UI flotante
+    const ui = document.querySelector('.ui-container');
+    if (ui) ui.style.display = 'none';
+
+    // 2. Encontrar el mapa
+    const mapElement = document.querySelector('.leaflet-container');
+
+    if (mapElement) {
+      try {
+        // Pequeña espera para asegurar que todo esté renderizado
+        await new Promise(r => setTimeout(r, 500));
+
+        // 3. Generar la imagen con html-to-image
+        const dataUrl = await toPng(mapElement, {
+          quality: 0.95,
+          cacheBust: true, // Ayuda a cargar imágenes externas (CORS)
+          filter: (node) => {
+            // Excluir botones de zoom de la foto final para que se vea limpio
+            if (node.classList && node.classList.contains('leaflet-control-zoom')) {
+              return false;
+            }
+            return true;
+          }
+        });
+
+        // 4. Descargar
+        const link = document.createElement('a');
+        link.download = `connection-map-${fromName || 'Origin'}-${toName || 'Destination'}.png`;
+        link.href = dataUrl;
+        link.click();
+
+      } catch (err) {
+        console.error("Error saving the image:", err);
+        alert("There was an error saving your image");
+      }
+    }
+
+    // 5. Mostrar la UI de nuevo
+    if (ui) ui.style.display = 'flex';
+  };
+
+
+  //Descargar el mensaje
+  const handleDownloadCard = async () => {
+    // 1. Seleccionamos la tarjeta del mensaje
+    const cardElement = document.querySelector('.popup-content');
+
+    if (cardElement) {
+      try {
+        await new Promise(r => setTimeout(r, 200));
+
+        const dataUrl = await toPng(cardElement, {
+          quality: 0.95,
+          cacheBust: true,
+          backgroundColor: '#ffffff', // Asegura fondo blanco
+          style: {
+             transform: 'scale(1)', // Evita distorsiones raras
+             boxShadow: 'none' // Quita la sombra para que se vea plano y limpio
+          },
+          filter: (node) => {
+            // TRUCO: Ignorar todos los botones en la foto (la X, el botón de descargar, etc)
+            // para que solo salga el texto y el icono.
+            if (node.tagName === 'BUTTON') {
+              return false;
+            }
+            return true;
+          }
+        });
+
+        const link = document.createElement('a');
+        link.download = `secret-letter-${fromName || 'Anonymous'}.png`;
+        link.href = dataUrl;
+        link.click();
+
+      } catch (err) {
+        console.error("Error saving the image:", err);
+        alert("There was an error saving your image");
+      }
+    }
+  };
+
  return (
     <div className="app-container">
       <MapContainer 
@@ -121,6 +213,12 @@ const handleLocationSelect = (latlng)=>{
           attribution='&copy; OpenStreetMap & CartoDB'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
+
+      {/* --- TU MARCA DE AGUA DEL MAPA --- */}
+        <div className="watermark">
+          @cynthiasalazarb {/* CAMBIA ESTO POR TU INSTAGRAM REAL */}
+        </div>
+
         {/* COMPONENTES LÓGICOS */}
         <LocationSelector onLocationSelect={handleLocationSelect} />
         <AutoZoom points={points} />
@@ -128,13 +226,18 @@ const handleLocationSelect = (latlng)=>{
         {!isViewingMode && <SearchControl onResult={handleLocationSelect}/>}
 
        {/* Visuals */}
-        {points.map((point, index) => (
-          <CircleMarker 
-            key={index} 
-            center={point} 
-            radius={8} 
-            pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.8 }}
-          />
+       {points.map((point, index) => (
+        <CircleMarker 
+          key={index} center={point} radius={8} 
+          pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.8 }}
+        >
+          {/* Lógica: Si es el punto 0 es "From", si es el 1 es "To" */}
+          <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent>
+            <span style={{ fontWeight: 'bold', fontSize: '14px' }}>
+              {index === 0 ? (fromName || "Origin") : (toName || "Destination")}
+            </span>
+          </Tooltip>
+        </CircleMarker>
         ))}
 
         {points.length === 2 && (
@@ -165,23 +268,47 @@ const handleLocationSelect = (latlng)=>{
         <div className="ui-container">
             {points.length < 2 ? (
             <div className="step-text">
-                <strong>Paso 1:</strong> Selecciona origen y destino en el mapa.
+                <strong>Step 1:</strong> Select two locations on the map.
             </div>
             ) : (
             <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
-                <label className="input-label">Tu mensaje secreto:</label>
+                
+                {/* INPUT NOMBRE 1 */}
+                  <input 
+                    type="text" 
+                    placeholder="Your Name (From)" 
+                    value={fromName} 
+                    onChange={e => setFromName(e.target.value)}
+                    style={{width: '50%', padding: '8px', borderRadius: '8px', border: '1px solid #ddd'}}
+                  />
+                  {/* INPUT NOMBRE 2 */}
+                  <input 
+                    type="text" 
+                    placeholder="Their Name (To)" 
+                    value={toName} 
+                    onChange={e => setToName(e.target.value)}
+                    style={{width: '50%', padding: '8px', borderRadius: '8px', border: '1px solid #ddd'}}
+                  />
+                
+                <label className="input-label">Your secret message:</label>
                 <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Escribe aquí (ej. 'Te extraño desde aquí...')"
+                placeholder="Type here (e.g. 'Missing you...')"
                 maxLength={600}
                 className="message-input"
                 />
+
+                {/* Opcional: Botón de descargar también para el creador */}
+                <button className="btn btn-secondary" onClick={handleDownloadImage}>
+                  📸 Save Map Image
+                </button>
+
                 <button 
                 onClick={() => {navigator.clipboard.writeText(window.location.href); alert("Link copiado 🔗");}}
                 className="btn btn-secondary"
                 >
-                Copiar Link para Compartir 🔗
+                Copy Link to Share 🔗
                 </button>
             </div>
             )}
@@ -192,10 +319,16 @@ const handleLocationSelect = (latlng)=>{
       {isViewingMode && letterArrived && !showPopup && (
          <div className="ui-container">
             <div className="view-mode-text">
-                <h3>¡Tienes una carta! 💌</h3>
-                <p>Ha viajado desde lejos para ti.</p>
+                <h3>You have a Letter! 💌</h3>
+                <p>It traveled a long way to find you.</p>
+                <p>From: <strong>{fromName || "Someone"}</strong> <br/> To: <strong>{toName || "Ti"}</strong></p>
+
+                <button className="btn btn-secondary" onClick={handleDownloadImage} style={{marginBottom:'10px'}}>
+                    📸 Save Memory
+                 </button>
+
                  <button onClick={() => setShowPopup(true)} className="btn btn-primary">
-                    Leer Mensaje ✨
+                   ✨ Read Message ✨
                 </button>
             </div>
          </div>
@@ -216,6 +349,14 @@ const handleLocationSelect = (latlng)=>{
                    <p className="popup-message">
                        {message}
                    </p>
+
+                   {/* --- NUEVO BOTÓN DE DESCARGA --- */}
+                   <button 
+                    className="btn btn-secondary"
+                    onClick={handleDownloadCard}
+                   >
+                    💾 Save Letter as Image
+                   </button>
                     
                    <button 
                     onClick={() => {
@@ -224,14 +365,21 @@ const handleLocationSelect = (latlng)=>{
                         window.history.replaceState({}, '', window.location.pathname);
                     }}
                     className="btn btn-ghost">
-                    Crear mi propio mapa
+                      Personalize my own map
                    </button>
+
+                    {/* --- TU MARCA DE AGUA DE LA CARTA --- */}
+                    <div className="watermark">
+                      @cynthiasalazarb
+                    </div>
+                   
                </div>
            </div>
        )}
 
     </div>
   )
+  
 }
 
 export default App
