@@ -3,6 +3,7 @@ import {useState, useEffect} from 'react'
 import 'leaflet/dist/leaflet.css'
 import LZString from 'lz-string'
 import { toPng } from 'html-to-image';
+import { Analytics } from "@vercel/analytics/react"
 //import html2canvas from 'html2canvas'
 //import L from 'leaflet';
 
@@ -376,6 +377,8 @@ const handleLocationSelect = (latlng)=>{
                </div>
            </div>
        )}
+
+        <Analytics />
 
     </div>
   )
