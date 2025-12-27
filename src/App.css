@@ -1,0 +1,155 @@
+/* src/App.css */
+
+/* Contenedor principal */
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden; /* Evita scrollbars accidentales */
+}
+
+/* --- UI Flotante (Caja blanca abajo) --- */
+.ui-container {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Textos informativos */
+.step-text {
+  text-align: center;
+  color: #666;
+  font-family: sans-serif;
+}
+
+.view-mode-text {
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.view-mode-text h3 {
+  margin: 0 0 10px 0;
+}
+
+/* Inputs y Labels */
+.input-label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.message-input {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  resize: none;
+  font-family: inherit;
+  box-sizing: border-box; /* Importante para que el padding no rompa el ancho */
+}
+
+/* Botones */
+.btn {
+  border: none;
+  padding: 15px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 5px;
+  width: 100%;
+  font-size: 16px;
+  transition: transform 0.1s ease, opacity 0.2s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: #ff0000;
+  color: white;
+}
+
+.btn-secondary {
+  background: #333;
+  color: white;
+}
+
+.btn-ghost {
+  background: #eee;
+  color: #333;
+  width: auto;
+  padding: 10px 20px;
+  border-radius: 30px;
+}
+
+/* --- Popup Final (Overlay) --- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.popup-content {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.close-btn:hover {
+  opacity: 1;
+}
+
+.popup-icon {
+  font-size: 50px;
+  margin-bottom: 20px;
+}
+
+.popup-message {
+  font-size: 18px;
+  line-height: 1.6;
+  font-family: 'Georgia', serif;
+  white-space: pre-wrap;
+}
+
+/* Animación simple */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
