@@ -364,7 +364,7 @@ const handleLocationSelect = (latlng)=>{
             <div className="view-mode-text">
                 <h3>You have a Letter! 💌</h3>
                 <p>It traveled a long way to find you.</p>
-                <p>From: <strong>{fromName || "Someone"}</strong> <br/> To: <strong>{toName || "Ti"}</strong></p>
+                <p>From: <strong>{fromName || "Someone"}</strong> <br/> To: <strong>{toName || "You"}</strong></p>
                  <button onClick={() => setShowPopup(true)} className="btn btn-primary">
                    ✨ Read Message ✨
                 </button>
