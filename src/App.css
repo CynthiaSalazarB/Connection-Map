@@ -82,14 +82,14 @@
 .btn-primary {
   background: #ff0000;
   color: white;
-  margin: 0 10px 0 0;
+  margin: 0 10px 10px 0;
   width: auto;
 }
 
 .btn-secondary {
   background: #0365de;
   color: white;
-  margin: 0 10px 0 0;
+  margin: 0 10px 10px 0;
   width: auto;
 }
 
@@ -99,6 +99,7 @@
   width: auto;
   padding: 10px 20px;
   border-radius: 30px;
+  margin: 0 0 10px 10px;
 }
 
 /* --- Popup Final (Overlay) --- */

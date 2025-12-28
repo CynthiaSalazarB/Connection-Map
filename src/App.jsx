@@ -139,12 +139,17 @@ const handleLocationSelect = (latlng)=>{
     if (mapElement) {
       try {
         // Pequeña espera para asegurar que todo esté renderizado
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 1000));
 
         // 3. Generar la imagen con html-to-image
         const dataUrl = await toPng(mapElement, {
           quality: 0.95,
           cacheBust: true, // Ayuda a cargar imágenes externas (CORS)
+          pixelRatio: 2, // Fuerza alta resolución (ayuda en iPhone)
+          skipAutoScale:true,
+          style:{
+            transform: 'translate3d(0,0,0)',
+          },
           filter: (node) => {
             // Excluir botones de zoom de la foto final para que se vea limpio
             if (node.classList && node.classList.contains('leaflet-control-zoom')) {
@@ -222,6 +227,7 @@ const handleLocationSelect = (latlng)=>{
         <TileLayer
           attribution='&copy; OpenStreetMap & CartoDB'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          crossOrigin="anonymous"
         />
 
       {/* --- TU MARCA DE AGUA DEL MAPA --- */}
@@ -330,7 +336,7 @@ const handleLocationSelect = (latlng)=>{
                 >
                 Copy Link to Share 🔗
                 </button>
-                
+
                 <button className="btn btn-secondary" onClick={handleDownloadImage}>
                   📸 Save Map Image
                 </button>
