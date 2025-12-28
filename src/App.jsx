@@ -281,7 +281,7 @@ const handleLocationSelect = (latlng)=>{
                   position={points[1]} // En el destino
                   icon={staticLetterIcon}
                   eventHandlers={{
-                    click: () => setShowPopup(true) // <--- AL CLICKEAR, ABRE LA CARTA
+                    click: () => setIsNotificationOpen(true) // <--- AL CLICKEAR, ABRE LA CARTA
                   }}
                   zIndexOffset={1000}
                 >
