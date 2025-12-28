@@ -1,11 +1,11 @@
-import {MapContainer, TileLayer,CircleMarker, Tooltip} from 'react-leaflet'
+import {MapContainer, TileLayer,CircleMarker, Tooltip, Marker} from 'react-leaflet'
 import {useState, useEffect} from 'react'
 import 'leaflet/dist/leaflet.css'
 import LZString from 'lz-string'
 import { toPng } from 'html-to-image';
 import { Analytics } from "@vercel/analytics/react"
 //import html2canvas from 'html2canvas'
-//import L from 'leaflet';
+import L from 'leaflet';
 
 import LocationSelector from './LocationSelector'
 import SearchControl from './SearchControl'
@@ -13,6 +13,13 @@ import AnimatedLine from './AnimatedLine'
 import TravelingIcon from './TravelingIcon'
 import AutoZoom from './AutoZoom'
 import './App.css'
+
+const staticLetterIcon = new L.DivIcon({
+  className: 'letter-icon',
+  html: '<div style="font-size: 30px; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3)); cursor: pointer;">💌</div>',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15]
+});
 
 function App() {
   
@@ -23,6 +30,8 @@ function App() {
   const [showPopup, setShowPopup] = useState(false);
   const [fromName, setFromName]=useState("");
   const [toName, setToName] = useState("");
+  const [isNotificationOpen, setIsNotificationOpen] = useState(true);
+  
   
   // FASE 1: LECTURA (Al cargar la página)
 
@@ -101,12 +110,12 @@ window.history.replaceState({}, '', `?${params.toString()}`);
 const handleLocationSelect = (latlng)=>{
   // Si intentan hacer clic mientras ven un mensaje, reiniciamos todo a modo creador
   if (isViewingMode) {
-      setIsViewingMode(false);
+      /* setIsViewingMode(false);
       setLetterArrived(false);
       setShowPopup(false);
       setMessage("");
       setPoints([latlng]);
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', window.location.pathname); */
       return;
    }
     
@@ -256,7 +265,21 @@ const handleLocationSelect = (latlng)=>{
                     startPos={points[0]} 
                     endPos={points[1]} 
                     onArrival={() => setLetterArrived(true)} // Cuando llegue, cambiar estado
+                    //onClick={() => setShowPopup(true)}
                 />
+            )}
+
+            {/* 2. CARTA EN DESTINO (Solo si YA llegó) - ESTE ES TU BOTÓN */}
+            {isViewingMode && letterArrived && (
+                <Marker 
+                  position={points[1]} // En el destino
+                  icon={staticLetterIcon}
+                  eventHandlers={{
+                    click: () => setShowPopup(true) // <--- AL CLICKEAR, ABRE LA CARTA
+                  }}
+                  zIndexOffset={1000}
+                >
+                </Marker>
             )}
           </>
         )}
@@ -301,38 +324,66 @@ const handleLocationSelect = (latlng)=>{
                 />
 
                 {/* Opcional: Botón de descargar también para el creador */}
+                <button 
+                onClick={() => {navigator.clipboard.writeText(window.location.href); alert("Link copiado 🔗");}}
+                className="btn btn-primary"
+                >
+                Copy Link to Share 🔗
+                </button>
+                
                 <button className="btn btn-secondary" onClick={handleDownloadImage}>
                   📸 Save Map Image
                 </button>
 
-                <button 
-                onClick={() => {navigator.clipboard.writeText(window.location.href); alert("Link copiado 🔗");}}
-                className="btn btn-secondary"
-                >
-                Copy Link to Share 🔗
-                </button>
             </div>
             )}
         </div>
       )}
 
       {/* CASO 2: MODO VISUALIZACIÓN (Botón de leer) */}
-      {isViewingMode && letterArrived && !showPopup && (
+      {isViewingMode && letterArrived && !showPopup && isNotificationOpen && (
          <div className="ui-container">
+
+          <button 
+                onClick={() => setIsNotificationOpen(false)}
+                style={{
+                    position: 'absolute', top: '10px', right: '10px', 
+                    background: 'transparent', border: 'none', 
+                    fontSize: '16px', cursor: 'pointer', color: '#999'
+                }}
+            >
+                ✕
+            </button>
+
             <div className="view-mode-text">
                 <h3>You have a Letter! 💌</h3>
                 <p>It traveled a long way to find you.</p>
                 <p>From: <strong>{fromName || "Someone"}</strong> <br/> To: <strong>{toName || "Ti"}</strong></p>
-
-                <button className="btn btn-secondary" onClick={handleDownloadImage} style={{marginBottom:'10px'}}>
-                    📸 Save Memory
-                 </button>
-
                  <button onClick={() => setShowPopup(true)} className="btn btn-primary">
                    ✨ Read Message ✨
                 </button>
+
+                <button className="btn btn-secondary" onClick={handleDownloadImage} style={{marginBottom:'10px'}}>
+                    📸 Save Map Image
+                 </button>
+
             </div>
          </div>
+      )}
+
+      {/* BOTÓN FLOTANTE PARA REABRIR (Solo si cerraron la notificación) */}
+      {isViewingMode && letterArrived && !showPopup && !isNotificationOpen && (
+          <button 
+            onClick={() => setIsNotificationOpen(true)} // O setShowPopup(true) si prefieres abrir la carta directo
+            style={{
+                position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)',
+                zIndex: 1000, background: 'white', padding: '10px 20px', borderRadius: '30px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)', border: 'none', cursor: 'pointer',
+                fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px'
+            }}
+          >
+            💌 Open Letter
+          </button>
       )}
 
        {/* POPUP FINAL CON EL MENSAJE */}

@@ -11,7 +11,7 @@ const letterIcon = new L.DivIcon({
     iconAnchor:[15,15]
 });
 
-const TravelingIcon = ({startPos, endPos, onArrival})=>{
+const TravelingIcon = ({startPos, endPos, onArrival, onClick})=>{
     const [currentPos, setCurrentPos] = useState(startPos);
     const animationRef = useRef(null);
 
@@ -63,6 +63,11 @@ const TravelingIcon = ({startPos, endPos, onArrival})=>{
         }
 
     },[startPos, endPos, onArrival]);
-    return <Marker position={currentPos} icon={letterIcon} zIndexOffset={1000} />;
+    return <Marker 
+        position={currentPos} 
+        icon={letterIcon} 
+        zIndexOffset={1000} 
+        eventHandlers={{ click: onClick }} 
+    />;
 };
 export default TravelingIcon;
