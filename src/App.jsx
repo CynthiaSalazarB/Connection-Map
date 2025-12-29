@@ -167,6 +167,7 @@ const handleLocationSelect = (latlng)=>{
 
       } catch (err) {
         console.error("Error saving the image:", err);
+        
         alert("There was an error saving your image");
       }
     }
@@ -303,22 +304,31 @@ const handleLocationSelect = (latlng)=>{
             ) : (
             <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
                 
-                {/* INPUT NOMBRE 1 */}
+              <div className="names-row">
+                {/* Campo 1: FROM */}
+                <div className="name-field">
+                  <label className="name-label">From:</label>
                   <input 
+                    className="name-input"
                     type="text" 
-                    placeholder="Your Name (From)" 
+                    placeholder="Me" 
                     value={fromName} 
                     onChange={e => setFromName(e.target.value)}
-                    style={{width: '50%', padding: '8px', borderRadius: '8px', border: '1px solid #ddd'}}
                   />
-                  {/* INPUT NOMBRE 2 */}
+                </div>
+
+                {/* Campo 2: TO */}
+                <div className="name-field">
+                  <label className="name-label">To:</label>
                   <input 
+                    className="name-input"
                     type="text" 
-                    placeholder="Their Name (To)" 
+                    placeholder="You" 
                     value={toName} 
                     onChange={e => setToName(e.target.value)}
-                    style={{width: '50%', padding: '8px', borderRadius: '8px', border: '1px solid #ddd'}}
                   />
+                </div>
+                </div>
                 
                 <label className="input-label">Your secret message:</label>
                 <textarea
@@ -413,17 +423,17 @@ const handleLocationSelect = (latlng)=>{
                     className="btn btn-secondary"
                     onClick={handleDownloadCard}
                    >
-                    💾 Save Letter as Image
+                    💾 Save Letter As Image
                    </button>
                     
                    <button 
                     onClick={() => {
                         // Reiniciar para que el usuario cree el suyo
-                        setIsViewingMode(false); setLetterArrived(false); setShowPopup(false); setMessage(""); setPoints([]);
+                        setIsViewingMode(false); setLetterArrived(false); setShowPopup(false); setMessage(""); setFromName(""); setToName(""); setPoints([]);
                         window.history.replaceState({}, '', window.location.pathname);
                     }}
                     className="btn btn-ghost">
-                      Personalize my own map
+                      Send My Own Letter
                    </button>
 
                     {/* --- TU MARCA DE AGUA DE LA CARTA --- */}

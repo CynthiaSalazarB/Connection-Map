@@ -44,11 +44,53 @@
   margin: 0 0 10px 0;
 }
 
-/* Inputs y Labels */
+/* --- Inputs y Labels (NUEVO) --- */
 .input-label {
   font-weight: bold;
   font-size: 14px;
   font-family: inherit;
+  margin-top: 5px;
+}
+
+/* Contenedor de los dos nombres (From/To) */
+.names-row {
+  display: flex;
+  gap: 15px; /* Espacio entre los dos inputs */
+  width: 100%;
+}
+
+/* Cada columna de nombre */
+.name-field {
+  flex: 1; /* Ocupan 50% cada uno */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Label pequeño encima del input */
+.name-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+  text-transform: uppercase; /* Opcional: hace que se vea más pro */
+  letter-spacing: 0.5px;
+}
+
+/* El input de nombre */
+.name-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-family: inherit;
+  box-sizing: border-box; /* CRÍTICO: Evita que se salgan del contenedor */
+  background: #f9f9f9;
+}
+
+.name-input:focus {
+  background: #fff;
+  border-color: #0365de;
+  outline: none;
 }
 
 .message-input {

@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import {useMap} from 'react-leaflet';
 import {GeoSearchControl, OpenStreetMapProvider} from 'leaflet-geosearch';
-import 'leaflet-geosearch/dist/geosearch.css'; // Estilos de la barra
+import 'leaflet-geosearch/dist/geosearch.css'; 
 
 const SearchControl = ({ onResult }) => {
   const map = useMap(); // Accedemos a la instancia del mapa
