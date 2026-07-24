@@ -4,6 +4,10 @@ Send someone you care about a place-to-place letter. Pick two points on a map, w
 
 **[▶ Try it live](https://connection-map-gamma.vercel.app/)**
 
+
+https://github.com/user-attachments/assets/bc41e5ba-26c9-405d-a5ae-79243e495c4f
+
+
 ## How it works
 
 1. The sender picks **two points** on a [Leaflet](https://leafletjs.com/) map, either by clicking or by searching a place name, then fills in *from* / *to* and writes a message.
