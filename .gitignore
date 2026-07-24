@@ -27,5 +27,7 @@ dist-ssr
 .env
 .env.*
 
-#ReadMe
-README.md
+# Demo video: too large to commit. Uploaded to GitHub via the README editor instead.
+docs/assets/*.mp4
+docs/assets/*.mov
+docs/assets/*.webm
