@@ -144,7 +144,6 @@ const handleLocationSelect = (latlng)=>{
         // 3. Generar la imagen con html-to-image
         const dataUrl = await toPng(mapElement, {
           quality: 0.95,
-          cacheBust: true, // Ayuda a cargar imágenes externas (CORS)
           pixelRatio: 2, // Fuerza alta resolución (ayuda en iPhone)
           skipAutoScale:true,
           style:{
@@ -224,10 +223,9 @@ const handleLocationSelect = (latlng)=>{
         scrollWheelZoom={true} 
         style={{ height: "100%", width: "100%" }}
       >
-      {/* Mapa base minimalista (CartoDB Voyager. se ve más limpio) */}
         <TileLayer
-          attribution='&copy; OpenStreetMap & CartoDB'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           crossOrigin="anonymous"
         />
 
